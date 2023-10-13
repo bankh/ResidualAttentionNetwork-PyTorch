@@ -1,0 +1,16 @@
+INFO:root:Epoch [1/300], Iter [100/782] Loss: 1.7029
+INFO:root:Epoch [1/300], Iter [200/782] Loss: 1.7758
+INFO:root:Epoch [1/300], Iter [300/782] Loss: 1.5439
+INFO:root:Epoch [1/300], Iter [400/782] Loss: 1.3518
+INFO:root:Epoch [1/300], Iter [500/782] Loss: 1.5800
+INFO:root:Epoch [1/300], Iter [600/782] Loss: 1.3134
+INFO:root:Epoch [1/300], Iter [700/782] Loss: 1.3291
+INFO:root:The epoch takes time: 181.03304314613342
+INFO:root:Epoch [2/300], Iter [100/782] Loss: 1.1093
+INFO:root:Epoch [2/300], Iter [200/782] Loss: 1.2367
+INFO:root:Epoch [2/300], Iter [300/782] Loss: 1.1111
+INFO:root:Epoch [2/300], Iter [400/782] Loss: 1.0368
+INFO:root:Epoch [2/300], Iter [500/782] Loss: 0.9691
+INFO:root:Epoch [2/300], Iter [600/782] Loss: 0.8626
+INFO:root:Epoch [2/300], Iter [700/782] Loss: 0.9995
+INFO:root:The epoch takes time: 181.59300351142883

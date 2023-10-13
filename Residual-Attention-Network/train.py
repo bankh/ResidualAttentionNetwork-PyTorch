@@ -10,26 +10,32 @@ from torchvision import transforms, datasets, models
 import os
 import cv2
 import time
-# from model.residual_attention_network_pre import ResidualAttentionModel
-# based https://github.com/liudaizong/Residual-Attention-Network
+import logging
+
 from model.residual_attention_network import ResidualAttentionModel_92_32input_update as ResidualAttentionModel
+#  from model.residual_attention_network_pre import ResidualAttentionModel
+# # based https://github.com/liudaizong/Residual-Attention-Network
 
-model_file = 'model_92_sgd.pkl'
+def generate_folder_name(model_arch, optimizer):
+    return f'saved/{model_arch}_{optimizer}'
 
+# Initialize logging
+folder_name = generate_folder_name('ResidualAttentionModel', 'sgd')
+os.makedirs(folder_name, exist_ok=True)
+log_file = f'{folder_name}/training.log'
+logging.basicConfig(filename=log_file, level=logging.INFO)
 
-# for test
+acc_best = 0
+early_stop_counter = 0
+early_stop_limit = 20
+total_epoch = 300
+
 def test(model, test_loader, btrain=False, model_file='model_92.pkl'):
-    # Test
     if not btrain:
         model.load_state_dict(torch.load(model_file))
     model.eval()
-
     correct = 0
     total = 0
-    #
-    class_correct = list(0. for i in range(10))
-    class_total = list(0. for i in range(10))
-
     for images, labels in test_loader:
         images = Variable(images.cuda())
         labels = Variable(labels.cuda())
@@ -37,102 +43,50 @@ def test(model, test_loader, btrain=False, model_file='model_92.pkl'):
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels.data).sum()
-        #
-        c = (predicted == labels.data).squeeze()
-        for i in range(20):
-            label = labels.data[i]
-            class_correct[label] += c[i]
-            class_total[label] += 1
-
-    print('Accuracy of the model on the test images: %d %%' % (100 * float(correct) / total))
-    print('Accuracy of the model on the test images:', float(correct)/total)
-    for i in range(10):
-        print('Accuracy of %5s : %2d %%' % (
-            classes[i], 100 * class_correct[i] / class_total[i]))
     return correct / total
 
-
-# Image Preprocessing
 transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),
-    transforms.RandomCrop((32, 32), padding=4),   #left, top, right, bottom
-    # transforms.Scale(224),
+    transforms.RandomCrop((32, 32), padding=4),
     transforms.ToTensor()
 ])
-test_transform = transforms.Compose([
-    transforms.ToTensor()
-])
-# when image is rgb, totensor do the division 255
-# CIFAR-10 Dataset
-train_dataset = datasets.CIFAR10(root='./data/',
-                               train=True,
-                               transform=transform,
-                               download=True)
+test_transform = transforms.Compose([transforms.ToTensor()])
+train_dataset = datasets.CIFAR10(root='./data/', train=True, transform=transform, download=True)
+test_dataset = datasets.CIFAR10(root='./data/', train=False, transform=test_transform)
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=64, shuffle=True, num_workers=8)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=20, shuffle=False)
 
-test_dataset = datasets.CIFAR10(root='./data/',
-                              train=False,
-                              transform=test_transform)
-
-# Data Loader (Input Pipeline)
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                           batch_size=64, # 64
-                                           shuffle=True, num_workers=8)
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
-                                          batch_size=20,
-                                          shuffle=False)
-
-classes = ('plane', 'car', 'bird', 'cat',
-           'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 model = ResidualAttentionModel().cuda()
-print(model)
-
-lr = 0.1  # 0.1
+lr = 0.1
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, nesterov=True, weight_decay=0.0001)
-is_train = True
-is_pretrain = False
-acc_best = 0
-total_epoch = 300
-if is_train is True:
-    if is_pretrain == True:
-        model.load_state_dict((torch.load(model_file)))
-    # Training
-    for epoch in range(total_epoch):
-        model.train()
-        tims = time.time()
-        for i, (images, labels) in enumerate(train_loader):
-            images = Variable(images.cuda())
-            # print(images.data)
-            labels = Variable(labels.cuda())
 
-            # Forward + Backward + Optimize
-            optimizer.zero_grad()
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-            # print("hello")
-            if (i+1) % 100 == 0:
-                print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" %(epoch+1, total_epoch, i+1, len(train_loader), loss.data[0]))
-        print('the epoch takes time:',time.time()-tims)
-        print('evaluate test set:')
-        acc = test(model, test_loader, btrain=True)
-        if acc > acc_best:
-            acc_best = acc
-            print('current best acc,', acc_best)
-            torch.save(model.state_dict(), model_file)
-        # Decaying Learning Rate
-        if (epoch+1) / float(total_epoch) == 0.3 or (epoch+1) / float(total_epoch) == 0.6 or (epoch+1) / float(total_epoch) == 0.9:
-            lr /= 10
-            print('reset learning rate to:', lr)
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = lr
-                print(param_group['lr'])
-            # optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-            # optim.SGD(model.parameters(), lr=lr, momentum=0.9, nesterov=True, weight_decay=0.0001)
-    # Save the Model
-    torch.save(model.state_dict(), 'last_model_92_sgd.pkl')
-
-else:
-    test(model, test_loader, btrain=False)
-
+for epoch in range(total_epoch):
+    model.train()
+    tims = time.time()
+    for i, (images, labels) in enumerate(train_loader):
+        images = Variable(images.cuda())
+        labels = Variable(labels.cuda())
+        optimizer.zero_grad()
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+        if (i+1) % 100 == 0:
+            log_message = f"Epoch [{epoch+1}/{total_epoch}], Iter [{i+1}/{len(train_loader)}] Loss: {loss.item():.4f}"
+            print(log_message)
+            logging.info(log_message)
+    log_message = f'The epoch takes time: {time.time() - tims}'
+    print(log_message)
+    logging.info(log_message)
+    print('Evaluate test set:')
+    acc = test(model, test_loader, btrain=True)
+    if acc > acc_best:
+        acc_best = acc
+        early_stop_counter = 0
+        model_file = f'{folder_name}/model_92_sgd_ep{epoch+1}_acc{acc_best:.4f}.pkl'
+        torch.save(model.state_dict(), model_file)
+    else:
+        early_stop_counter += 1
+    if early_stop_counter >= early_stop_limit:
+        break
