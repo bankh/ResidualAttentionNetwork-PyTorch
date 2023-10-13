@@ -61,6 +61,8 @@ lr = 0.1
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, nesterov=True, weight_decay=0.0001)
 
+every_some_epochs = 20  # Set this to the frequency you want to save the model
+
 for epoch in range(total_epoch):
     model.train()
     tims = time.time()
@@ -88,5 +90,12 @@ for epoch in range(total_epoch):
         torch.save(model.state_dict(), model_file)
     else:
         early_stop_counter += 1
+
+    # Save model every 20 epochs
+    if (epoch + 1) % every_some_epochs == 0:
+        model_file = f'{folder_name}/model_92_sgd_ep{epoch+1}.pkl'
+        torch.save(model.state_dict(), model_file)
+        print(f'Model saved at epoch {epoch + 1}')
+
     if early_stop_counter >= early_stop_limit:
         break

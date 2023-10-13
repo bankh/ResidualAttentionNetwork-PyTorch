@@ -13,7 +13,7 @@ I also added the ResidualAttentionModel_92 for training imagenet, ResidualAttent
 # Referenced Paper
 ```
 Wang, F., Jiang, M., Qian, C., Yang, S., Li, C., Zhang, H., ... & Tang, X. (2017). Residual attention network for image classification.
- In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3156-3164).
+In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3156-3164).
 ```
 
 # Setup 
