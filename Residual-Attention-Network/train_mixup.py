@@ -16,7 +16,6 @@ from model.residual_attention_network import ResidualAttentionModel_92_32input_u
 
 model_file = 'model_92_sgd_mixup300_normal20.pkl'
 
-
 def mixup_data(x, y, alpha=1.0, use_cuda=True):
     '''Returns mixed inputs, pairs of targets, and lambda'''
     if alpha > 0:
