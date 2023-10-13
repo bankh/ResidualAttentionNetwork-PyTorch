@@ -12,7 +12,8 @@ I also added the ResidualAttentionModel_92 for training imagenet, ResidualAttent
 
 # Referenced Paper
 ```
-Wang, F., Jiang, M., Qian, C., Yang, S., Li, C., Zhang, H., ... & Tang, X. (2017). Residual attention network for image classification. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3156-3164).
+Wang, F., Jiang, M., Qian, C., Yang, S., Li, C., Zhang, H., ... & Tang, X. (2017). Residual attention network for image classification.
+ In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3156-3164).
 ```
 
 # Setup 
@@ -62,7 +63,7 @@ CUDA_VISIBLE_DEVICES=0 python train.py
 ```
 - For data augmentation, one can use:  
 ```
-CUDA_VISIBLE_DEVICES=0 python train_mixup.py(with mixup) 
+CUDA_VISIBLE_DEVICES=0 python train_mixup.py #(with mixup) 
 ```
 
 - One can train on ResidualAttentionModel_56 or ResidualAttentionModel_448input by modifying the code in train.py as:  
@@ -84,18 +85,18 @@ CUDA_VISIBLE_DEVICES=0 python train.py
 ```
 - For data augmentation, one can use:
 ```
-CUDA_VISIBLE_DEVICES=0 python train_mixup.py(with mixup) 
+CUDA_VISIBLE_DEVICES=0 python train_mixup.py #(with mixup) 
 ```
 # Results
-1. cifar-10: Acc-95.4(Top-1 err 4.6) with ResidualAttentionModel_92_32input_update(higher than paper top-1 err 4.99)
-2. cifar-10: Acc-96.65(Top-1 err 3.35) with ResidualAttentionModel_92_32input_update(with mixup).
-3. cifar-10: Acc-96.84(Top-1 err 3.16) with ResidualAttentionModel_92_32input_update(with mixup, with simpler attention module).
+1. cifar-10: Acc-95.4(Top-1 err 4.6) with ResidualAttentionModel_92_32input_update(higher than paper top-1 err 4.99)  
+2. cifar-10: Acc-96.65(Top-1 err 3.35) with ResidualAttentionModel_92_32input_update(with mixup).  
+3. cifar-10: Acc-96.84(Top-1 err 3.16) with ResidualAttentionModel_92_32input_update(with mixup, with simpler attention module).  
 
 ## Acknowledgement 
-Thanks to @PistonY, who gave me the advice on mixup.
-For more details on mixup you can reference the project https://github.com/facebookresearch/mixup-cifar10
+Thanks to @PistonY, who gave me the advice on mixup.  
+For more details on mixup you can reference the project https://github.com/facebookresearch/mixup-cifar10  
 
-The paper only gives the architectural details of attention_92 for Imagenet with 224 input --not for CIFAR10. 
+The paper only gives the architectural details of attention_92 for Imagenet with 224 input --not for CIFAR10.  
 
 # Supporting Information:
 - model_92_sgd.pkl is the trained model file, an accuracy of 0.954
